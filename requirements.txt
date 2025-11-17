@@ -1,3 +1,4 @@
+alembic==1.17.2
 black==25.11.0
 blinker==1.9.0
 certifi==2025.11.12
@@ -9,6 +10,8 @@ filelock==3.20.0
 flake8==7.3.0
 Flask==3.1.2
 flask-cors==6.0.1
+Flask-Migrate==4.1.0
+Flask-SQLAlchemy==3.1.1
 future==1.0.0
 gevent==25.9.1
 greenlet==3.2.4
@@ -16,6 +19,7 @@ idna==3.11
 isort==7.0.0
 itsdangerous==2.2.0
 Jinja2==3.1.6
+Mako==1.3.10
 MarkupSafe==3.0.3
 mccabe==0.7.0
 mypy_extensions==1.1.0
@@ -30,7 +34,10 @@ python-dotenv==1.2.1
 pytokens==0.3.0
 requests==2.32.5
 requests-file==3.0.1
+SQLAlchemy==2.0.44
+SQLAlchemy-Utils==0.42.0
 tldextract==5.3.0
+typing_extensions==4.15.0
 urllib3==2.5.0
 Werkzeug==3.1.3
 zope.event==6.1
