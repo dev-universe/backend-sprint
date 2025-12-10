@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, date
 from app import db, bcrypt
 
 
@@ -23,7 +23,10 @@ class Todo(db.Model):
     done = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-    # 새로 추가
+    description = db.Column(db.Text, nullable=True)
+    priority = db.Column(db.String(10), nullable=False, default="normal")
+    due_date = db.Column(db.Date, nullable=True)
+
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
 
     def to_dict(self):
@@ -33,4 +36,7 @@ class Todo(db.Model):
             "done": self.done,
             "created_at": self.created_at.isoformat(),
             "user_id": self.user_id,
+            "description": self.description,
+            "priority": self.priority,
+            "due_date": self.due_date.isoformat() if self.due_date else None,
         }

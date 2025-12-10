@@ -7,7 +7,18 @@ from app.utils import success, error
 
 bp = Blueprint("todo", __name__)
 logger = logging.getLogger(__name__)
+VALID_PRIORITIES = {"low", "normal", "high"}
 
+def parse_due_date(value: str | None):
+    if value is None:
+        return None
+    from datetime import date
+
+    try:
+        year, month, day = map(int, value.split("-"))  # "2025-12-31" 형식 기대
+        return date(year, month, day)
+    except Exception:
+        return None
 
 @bp.route("/todos", methods=["GET"])
 @jwt_required()
@@ -26,16 +37,50 @@ def get_todos():
 def create_todo():
     user_id = int(get_jwt_identity())
     data = request.get_json() or {}
-    title = data.get("title")
 
+    title = data.get("title")
+    description = data.get("description")
+    priority = data.get("priority", "normal")
+    due_date_raw = data.get("due_date")
+
+    # title 검증
     if not title or not isinstance(title, str):
         return error("title is required and must be a string", 400)
 
-    todo = Todo(title=title, user_id=user_id)
+    # description 검증
+    if description is not None and not isinstance(description, str):
+        return error("description must be a string if provided", 400)
+
+    # priority 검증
+    if priority not in VALID_PRIORITIES:
+        return error("priority must be one of: low, normal, high", 400)
+
+    # due_date 검증 + 파싱
+    due_date = None
+    if due_date_raw is not None:
+        if not isinstance(due_date_raw, str):
+            return error("due_date must be a string in YYYY-MM-DD format", 400)
+        due_date = parse_due_date(due_date_raw)
+        if due_date is None:
+            return error("due_date must be valid date in YYYY-MM-DD format", 400)
+
+    todo = Todo(
+        title=title,
+        description=description,
+        priority=priority,
+        due_date=due_date,
+        user_id=user_id,
+    )
     db.session.add(todo)
     db.session.commit()
 
-    logger.info("create_todo: user_id=%s todo_id=%s", user_id, todo.id)
+    logger.info(
+        "create_todo: user_id=%s todo_id=%s priority=%s due_date=%s",
+        user_id,
+        todo.id,
+        todo.priority,
+        todo.due_date,
+    )
 
     return success(data=todo.to_dict(), message="todo created"), 201
 

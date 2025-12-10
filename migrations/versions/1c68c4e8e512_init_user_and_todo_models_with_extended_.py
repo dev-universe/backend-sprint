@@ -1,8 +1,8 @@
-"""init use and todo models
+"""init user and todo models with extended fields
 
-Revision ID: d6cdbfd12c95
+Revision ID: 1c68c4e8e512
 Revises: 
-Create Date: 2025-12-09 19:30:30.129219
+Create Date: 2025-12-10 17:14:58.765296
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'd6cdbfd12c95'
+revision = '1c68c4e8e512'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -31,6 +31,9 @@ def upgrade():
     sa.Column('title', sa.String(length=100), nullable=False),
     sa.Column('done', sa.Boolean(), nullable=True),
     sa.Column('created_at', sa.DateTime(), nullable=True),
+    sa.Column('description', sa.Text(), nullable=True),
+    sa.Column('priority', sa.String(length=10), nullable=False),
+    sa.Column('due_date', sa.Date(), nullable=True),
     sa.Column('user_id', sa.Integer(), nullable=False),
     sa.ForeignKeyConstraint(['user_id'], ['user.id'], ),
     sa.PrimaryKeyConstraint('id')
