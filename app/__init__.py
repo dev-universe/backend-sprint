@@ -7,6 +7,7 @@ from flask_migrate import Migrate
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import JWTManager
 from dotenv import load_dotenv
+from app.config import config_by_name
 
 # --- Extensions ---
 db = SQLAlchemy()
@@ -15,7 +16,8 @@ bcrypt = Bcrypt()
 jwt = JWTManager()
 
 
-def create_app():
+def create_app(config_name="dev"):
+
     # Load environment variables
     load_dotenv()
 
@@ -24,11 +26,12 @@ def create_app():
     # CORS
     CORS(app)
 
+    # Load Config Object
+    app.config.from_object(config_by_name[config_name])
+    
     # Config
-    app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URL")
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-    app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_KEY", "dev-secret")
-
+    
     # Logging
     logging.basicConfig(
         level=logging.INFO,
@@ -45,11 +48,11 @@ def create_app():
     from app import models  # noqa: F401
 
     # Register blueprints
-    from app.routes import bp as todo_bp
-    from app.user_routes import bp as user_bp
+    from app.api.v1.todo_routes import bp as todo_bp
+    from app.api.v1.auth_routes import bp as user_bp
 
-    app.register_blueprint(todo_bp, url_prefix="/api")
-    app.register_blueprint(user_bp, url_prefix="/auth")
+    app.register_blueprint(todo_bp, url_prefix="/api/v1")
+    app.register_blueprint(user_bp, url_prefix="/api/v1/auth")
 
     # Root healthcheck route
     @app.route("/")
